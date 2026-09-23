@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debora Food Complex — ERP</title>
+<meta name="description" content="Enterprise resource planning system for Debora Food Complex featuring store requests, inventory, manufacturing, quality control, sales, and accounting.">
+<meta property="og:title" content="Debora Food Complex — ERP">
+<meta property="og:description" content="Enterprise resource planning system for Debora Food Complex featuring store requests, inventory, manufacturing, quality control, sales, and accounting.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/src/erp.css">
+</head>
+<body>
+
+<div class="o-drawer" id="oDrawer" role="dialog" aria-modal="true" aria-label="All apps">
+  <div class="o-drawer-head">
+    <div>
+      <div class="o-drawer-title">Debora Food Complex</div>
+      <div class="o-drawer-subtitle">Demo User · System Administrator</div>
+    </div>
+    <button type="button" class="o-drawer-close" id="oDrawerClose" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="o-drawer-grid" id="oDrawerGrid"></div>
+</div>
+
+<nav class="o-navbar">
+  <button class="o-apps-toggle" type="button" id="oAppsToggle" title="All apps"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+  <button class="o-app-name" id="oAppName"><i class="bi bi-grid-1x2-fill"></i><span>Debora Food Complex</span></button>
+  <button class="o-systray-btn o-menu-toggle" type="button" id="oMenuToggle" style="display:none;"><i class="bi bi-list"></i></button>
+  <div class="o-menu" id="oMenu"></div>
+  <div class="o-systray">
+    <button class="o-systray-btn" id="oDashShortcut" title="Dashboard"><i class="bi bi-house-door"></i></button>
+    <div class="dropdown">
+      <button class="o-systray-btn" type="button" data-bs-toggle="dropdown" title="Notifications"><i class="bi bi-bell"></i></button>
+      <div class="dropdown-menu dropdown-menu-end" style="width:300px;">
+        <div class="dropdown-header">Notifications</div>
+        <div class="px-3 py-3 text-muted text-center" style="font-size:12.5px;">
+          <i class="bi bi-bell-slash d-block mb-1" style="font-size:20px;opacity:.4;"></i>
+          Notifications module arrives in Stage 4.
+        </div>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="o-user-btn" type="button" data-bs-toggle="dropdown">
+        <span class="o-avatar">SA</span>
+        <span class="o-user-name d-none d-lg-inline">System Administrator</span>
+        <i class="bi bi-chevron-down small text-muted"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li class="px-3 py-2">
+          <div class="fw-semibold">System Administrator</div>
+          <div class="text-muted" style="font-size:11.5px;">admin@debora.local</div>
+          <div class="mt-1"><span class="o-chip">General Manager</span></div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" id="oChangePw"><i class="bi bi-key me-2"></i>Change password</a></li>
+        <li><a class="dropdown-item" id="oUsersLink"><i class="bi bi-sliders2 me-2"></i>Users &amp; access rights</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" id="oLogout"><i class="bi bi-box-arrow-right me-2"></i>Log out</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="o-control-panel">
+  <div>
+    <div class="o-breadcrumb" id="oBreadcrumb"></div>
+    <h1 class="o-cp-title" id="oCpTitle">Dashboard</h1>
+  </div>
+  <div class="o-cp-actions" id="oCpActions"></div>
+</div>
+
+<main class="o-content" id="content"></main>
+
+<div class="modal fade" id="srModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard-plus me-2"></i>Store Request</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="srModalBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="prModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="bi bi-cart-plus me-2"></i>Purchase Request</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="prModalBody"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="/src/erp.js"></script>
+</body>
+</html>

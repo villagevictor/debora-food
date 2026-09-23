@@ -1,0 +1,6 @@
+{
+  "name": "Debora Food Complex ERP",
+  "description": "Enterprise resource planning system for Debora Food Complex featuring store requests, inventory, manufacturing, quality control, sales, and accounting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
