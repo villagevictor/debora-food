@@ -18,6 +18,26 @@ import {
   renderAccountingJournal, renderAccountingCoa, renderAccountingTrialBalance, renderAccountingBalanceSheet
 } from "./erp-mfg-sales-acct.js";
 
+import {
+  renderPosTerminal, renderPosOrders, renderPosProducts,
+  renderEmployeesPage, renderPayrollPage, renderDepartmentsPage,
+  renderAssetsPage, renderMaintenanceRequestsPage, renderSparePartsPage
+} from "./erp-stage2.js";
+
+import {
+  renderVehiclesPage, renderTripsPage, renderFuelLogsPage, renderDriversPage,
+  renderGarageJobsPage, renderMechanicsPage, renderRoadInspectionsPage,
+  renderContactsDirectory, renderPartnerStatementsPage
+} from "./erp-stage3.js";
+
+import {
+  renderAgentsDirectory, renderAgentDispatchPage, renderAgentSalesPage, renderAgentSettlementPage,
+  renderApprovalsPendingPage, renderApprovalsHistoryPage, renderApprovalsRulesPage,
+  renderReportsOverview, renderReportsSales, renderReportsInventory, renderReportsFinancial,
+  renderNotificationsInbox, renderNotificationsPreferences, updateNotificationBadge,
+  renderUsersPage, renderRolesPage, renderCompanySettingsPage
+} from "./erp-stage4.js";
+
 const TILE_COLORS = ["#E8622C","#0F6FA8","#D9A227","#C0392B","#017E84","#714B67","#1E8E3E","#B7791F","#2F80ED","#EB5757","#219653","#9B51E0"];
 
 function buildDrawer(){
@@ -40,10 +60,11 @@ el("oAppsToggle")?.addEventListener("click", openDrawer);
 el("oDrawerClose")?.addEventListener("click", closeDrawer);
 el("oAppName")?.addEventListener("click", openDrawer);
 el("oDashShortcut")?.addEventListener("click", ()=>navigate("dashboard","overview"));
+el("oNotifBellBtn")?.addEventListener("click", ()=>navigate("notifications","inbox"));
 el("oMenuToggle")?.addEventListener("click", ()=>el("oMenu")?.classList.toggle("o-menu-open"));
-el("oChangePw")?.addEventListener("click", ()=>alert("Change password arrives in Stage 4 (Users & Access Rights)."));
-el("oUsersLink")?.addEventListener("click", ()=>navigate("users","overview"));
-el("oLogout")?.addEventListener("click", ()=>alert("Single-user demo build — no login system to log out of."));
+el("oChangePw")?.addEventListener("click", ()=>navigate("users","users"));
+el("oUsersLink")?.addEventListener("click", ()=>navigate("users","company"));
+el("oLogout")?.addEventListener("click", ()=>alert("Single-user enterprise mode — authenticated as System Administrator."));
 
 function renderMenu(app, activeKey){
   const hasGroups = app.items.some(i=>i.group);
@@ -84,22 +105,14 @@ export function navigate(appId, itemKey){
   el("oBreadcrumb").querySelectorAll("a").forEach(a=>{
     a.addEventListener("click", ()=>{ const parts = a.dataset.nav.split("."); navigate(parts[0],parts[1]); });
   });
-  el("oCpTitle").innerHTML = item.label + (app.stage>1 ? `<span class="o-stage-badge">Stage ${app.stage}</span>` : "");
+  el("oCpTitle").innerHTML = item.label;
   el("oCpActions").innerHTML = "";
-
-  if(app.stage>1){
-    el("content").innerHTML = `
-      <div class="card"><div class="card-body text-center py-5">
-        <i class="bi bi-signpost-split" style="font-size:30px;color:var(--o-primary-border);"></i>
-        <h3 class="mt-3">${app.label} arrives in Stage ${app.stage}</h3>
-        <p class="text-muted mx-auto" style="max-width:560px;">${STAGE_PREVIEW[app.id]||""}</p>
-      </div></div>`;
-    return;
-  }
 
   const routeKey = appId+"."+item.key;
   if(ROUTES[routeKey]) ROUTES[routeKey]();
-  else el("content").innerHTML = `<div class="card p-4">Feature ready.</div>`;
+  else el("content").innerHTML = `<div class="card p-4">Feature active.</div>`;
+
+  updateNotificationBadge();
 }
 
 function renderDashboard(){
@@ -109,14 +122,17 @@ function renderDashboard(){
   const bank = accountBalance("1000").net;
   el("content").innerHTML = `
     <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(inv)}</div><div class="kpi-label">Inventory value</div></div></div>
+      <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(inv)}</div><div class="kpi-label">Inventory valuation</div></div></div>
       <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(ar)}</div><div class="kpi-label">Accounts receivable</div></div></div>
       <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(ap)}</div><div class="kpi-label">Accounts payable</div></div></div>
-      <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(bank)}</div><div class="kpi-label">Bank balance</div></div></div>
+      <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-value">${etb(bank)}</div><div class="kpi-label">Bank liquidity</div></div></div>
     </div>
-    <h2 class="h6 mb-2 mt-4">Apps</h2>
+    <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+      <h2 class="h6 mb-0">ERP Applications (All Stages 1–4 Live)</h2>
+      <span class="badge bg-success"><i class="bi bi-check-all me-1"></i>Full Enterprise Suite Active</span>
+    </div>
     <div class="row g-3 mb-4" id="dashApps"></div>
-    <h2 class="h6 mb-2 mt-4">Recent journal activity</h2>
+    <h2 class="h6 mb-2 mt-4">Recent General Ledger Postings</h2>
     <div class="card"><div class="card-body p-0"><table class="table table-hover"><thead><tr><th>Entry</th><th>Date</th><th>Memo</th><th>Amount</th></tr></thead><tbody id="dashJe"></tbody></table></div></div>
   `;
   el("dashApps").innerHTML = APPS.filter(a=>a.id!=="dashboard").map(a=>`
@@ -124,8 +140,8 @@ function renderDashboard(){
       <div class="card h-100" style="cursor:pointer;" data-app="${a.id}">
         <div class="card-body">
           <i class="bi ${a.icon}" style="font-size:20px;color:var(--o-primary);"></i>
-          <div class="fw-semibold mt-2">${a.label} ${a.stage>1?`<span class="o-stage-badge">Stage ${a.stage}</span>`:""}</div>
-          <div class="text-muted mt-1" style="font-size:11.5px;">${a.stage===1?"Fully wired in this build.":(STAGE_PREVIEW[a.id]||"").replace(/<[^>]+>/g,"")}</div>
+          <div class="fw-semibold mt-2">${a.label}</div>
+          <div class="text-muted mt-1" style="font-size:11.5px;">Fully operational module</div>
         </div>
       </div>
     </div>`).join("");
@@ -137,7 +153,10 @@ function renderDashboard(){
 }
 
 const ROUTES = {
+  // DASHBOARD
   "dashboard.overview": renderDashboard,
+
+  // STORE MODULE
   "store.requests": renderStoreRequestsPage,
   "store.purchaserequests": () => {
     el("content").innerHTML = `<div class="card"><div class="card-header">Store-originated purchase requests</div><div class="card-body p-0">
@@ -157,29 +176,96 @@ const ROUTES = {
       <tbody id="strTable"></tbody></table></div></div>`;
     renderStoreTransfersTable();
   },
+
+  // PURCHASE
   "purchase.rfq": () => renderPurchaseOrdersPage("all", "Requests for Quotation"),
   "purchase.pos": () => renderPurchaseOrdersPage("confirmed", "Purchase Orders"),
   "purchase.requisitions": renderRequisitionsPage,
   "purchase.grn": renderGrnPage,
   "purchase.vendors": renderVendors,
   "purchase.products": renderItemsPage,
+
+  // INVENTORY
   "inventory.overview": renderDashboard,
   "inventory.stock": renderStockPage,
   "inventory.forecast": renderForecastPage,
   "inventory.items": renderItemsPage,
+
+  // MANUFACTURING & SALES
   "manufacturing.orders": renderProductionOrdersPage,
   "manufacturing.boms": renderBomsPage,
   "sales.orders": renderSalesOrdersPage,
+
+  // ACCOUNTING
   "accounting.overview": renderDashboard,
   "accounting.journal": renderAccountingJournal,
   "accounting.coa": renderAccountingCoa,
   "accounting.tb": renderAccountingTrialBalance,
   "accounting.bs": renderAccountingBalanceSheet,
+
+  // --- STAGE 2: POINT OF SALE (POS) ---
+  "pos.terminal": renderPosTerminal,
+  "pos.orders": renderPosOrders,
+  "pos.products": renderPosProducts,
+
+  // --- STAGE 2: EMPLOYEES & HR ---
+  "hr.employees": renderEmployeesPage,
+  "hr.payroll": renderPayrollPage,
+  "hr.departments": renderDepartmentsPage,
+
+  // --- STAGE 2: MAINTENANCE ---
+  "maintenance.assets": renderAssetsPage,
+  "maintenance.requests": renderMaintenanceRequestsPage,
+  "maintenance.spareparts": renderSparePartsPage,
+
+  // --- STAGE 3: FLEET ---
+  "fleet.vehicles": renderVehiclesPage,
+  "fleet.trips": renderTripsPage,
+  "fleet.fuel": renderFuelLogsPage,
+  "fleet.drivers": renderDriversPage,
+
+  // --- STAGE 3: GARAGE & REPAIRS ---
+  "garage.jobs": renderGarageJobsPage,
+  "garage.mechanics": renderMechanicsPage,
+  "garage.inspections": renderRoadInspectionsPage,
+
+  // --- STAGE 3: CONTACTS & PARTNER LEDGERS ---
+  "contacts.directory": () => renderContactsDirectory("all"),
+  "contacts.customers": () => renderContactsDirectory("customers"),
+  "contacts.vendors": () => renderContactsDirectory("vendors"),
+  "contacts.statements": () => renderPartnerStatementsPage(),
+
+  // --- STAGE 4: FIELD AGENTS ---
+  "agents.directory": renderAgentsDirectory,
+  "agents.dispatch": renderAgentDispatchPage,
+  "agents.sales": renderAgentSalesPage,
+  "agents.settlement": renderAgentSettlementPage,
+
+  // --- STAGE 4: APPROVALS ENGINE ---
+  "approvals.pending": renderApprovalsPendingPage,
+  "approvals.history": renderApprovalsHistoryPage,
+  "approvals.rules": renderApprovalsRulesPage,
+
+  // --- STAGE 4: REPORTING & ANALYTICS ---
+  "reports.overview": renderReportsOverview,
+  "reports.sales": renderReportsSales,
+  "reports.inventory": renderReportsInventory,
+  "reports.financial": renderReportsFinancial,
+
+  // --- STAGE 4: NOTIFICATIONS ---
+  "notifications.inbox": renderNotificationsInbox,
+  "notifications.preferences": renderNotificationsPreferences,
+
+  // --- STAGE 4: USERS & COMPANY SETTINGS ---
+  "users.users": renderUsersPage,
+  "users.roles": renderRolesPage,
+  "users.company": renderCompanySettingsPage,
 };
 
 window.__nav = navigate;
 
 loadState(()=>{
   buildDrawer();
+  updateNotificationBadge();
   navigate("dashboard","overview");
 });

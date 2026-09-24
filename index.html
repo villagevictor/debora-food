@@ -36,16 +36,10 @@
   <div class="o-menu" id="oMenu"></div>
   <div class="o-systray">
     <button class="o-systray-btn" id="oDashShortcut" title="Dashboard"><i class="bi bi-house-door"></i></button>
-    <div class="dropdown">
-      <button class="o-systray-btn" type="button" data-bs-toggle="dropdown" title="Notifications"><i class="bi bi-bell"></i></button>
-      <div class="dropdown-menu dropdown-menu-end" style="width:300px;">
-        <div class="dropdown-header">Notifications</div>
-        <div class="px-3 py-3 text-muted text-center" style="font-size:12.5px;">
-          <i class="bi bi-bell-slash d-block mb-1" style="font-size:20px;opacity:.4;"></i>
-          Notifications module arrives in Stage 4.
-        </div>
-      </div>
-    </div>
+    <button class="o-systray-btn position-relative" id="oNotifBellBtn" title="Notifications">
+      <i class="bi bi-bell"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="oNotifBadge" style="font-size:10px; display:none;">0</span>
+    </button>
     <div class="dropdown">
       <button class="o-user-btn" type="button" data-bs-toggle="dropdown">
         <span class="o-avatar">SA</span>

@@ -24,16 +24,30 @@ export async function loadState(onReady){
 function seedOpeningStock(){
   if(state.ledger.length>0) return;
   const openings = [
-    {itemId:"itm-maize", warehouseId:"wh-silo", qty:300, unitCost:35.00},
-    {itemId:"itm-bag",   warehouseId:"wh-pm",   qty:150, unitCost:22.00},
+    {itemId:"itm-maize", warehouseId:"wh-silo", qty:3000, unitCost:35.00},
+    {itemId:"itm-bag",   warehouseId:"wh-pm",   qty:1500, unitCost:22.00},
+    {itemId:"itm-duket", warehouseId:"wh-fg",   qty:85, unitCost:1820.00},
+    {itemId:"itm-flour-10kg", warehouseId:"wh-fg", qty:140, unitCost:410.00},
+    {itemId:"itm-flour-5kg", warehouseId:"wh-fg", qty:220, unitCost:215.00},
+    {itemId:"itm-bran",  warehouseId:"wh-byp",  qty:600, unitCost:14.00},
+    {itemId:"itm-sp-belt", warehouseId:"wh-pm", qty:8, unitCost:1250.00},
+    {itemId:"itm-sp-oil", warehouseId:"wh-pm",  qty:12, unitCost:3400.00},
+    {itemId:"itm-sp-bearing", warehouseId:"wh-pm", qty:10, unitCost:850.00},
   ];
-  let total = 0;
+  let totalStock = 0;
   openings.forEach(o=>{
     const cost = postLedger({itemId:o.itemId, warehouseId:o.warehouseId, type:"OPENING_BALANCE", qtyIn:o.qty, unitCost:o.unitCost, ref:"Opening balance"});
-    total += o.qty*cost;
+    totalStock += o.qty*cost;
   });
-  postJournal("Opening stock balance", [
-    {account:"1200", debit:round2(total), credit:0}, {account:"3000", debit:0, credit:round2(total)},
+  // Opening Balance Sheet: Stock + Operating Bank + Cash Till against Equity
+  const bankFund = 850000;
+  const tillFund = 25000;
+  const totalEquity = round2(totalStock + bankFund + tillFund);
+  postJournal("Opening capital and inventory balance", [
+    {account:"1200", debit:round2(totalStock), credit:0},
+    {account:"1000", debit:bankFund, credit:0},
+    {account:"1050", debit:tillFund, credit:0},
+    {account:"3000", debit:0, credit:totalEquity},
   ], "OPENING");
   saveState();
 }
